@@ -44,14 +44,23 @@ VALID_CATEGORIES = {
     "ui", "mechanical", "explosion", "footstep", "other"
 }
 
-ANALYSIS_PROMPT = """Analyze this audio file from the video game Half-Life.
+ANALYSIS_PROMPT_TEMPLATE = """Analyze this audio file from the video game Half-Life.
+
+File: {filename}
+Directory: {directory}
+
+IMPORTANT: Use the filename and directory as context! For example:
+- "apache" directory = Apache helicopter sounds (mechanical)
+- "weapons" directory = weapon sounds
+- "buttons" or "doors" directory = UI/mechanical sounds
+- "agrunt" = Alien Grunt creature, "houndeye" = Houndeye creature, etc.
 
 Respond with ONLY a JSON object (no markdown, no extra text):
-{"description": "1-2 sentence description", "tags": ["tag1", "tag2", "tag3"], "category": "category"}
+{{"description": "1-2 sentence description", "tags": ["tag1", "tag2", "tag3"], "category": "category"}}
 
 category MUST be exactly one of: speech, creature, weapon, ambient, music, ui, mechanical, explosion, footstep, other
 
-Example: {"description": "A scientist says hello", "tags": ["speech", "male", "greeting"], "category": "speech"}"""
+Example: {{"description": "Apache helicopter rotor spinning up", "tags": ["helicopter", "rotor", "mechanical"], "category": "mechanical"}}"""
 
 
 def compute_hash(file_path: Path) -> str:
@@ -105,12 +114,18 @@ def analyze_with_gemini(file_path: Path, client: genai.Client) -> dict:
     max_retries = 3
     base_delay = 2
 
+    # Build prompt with file context
+    prompt = ANALYSIS_PROMPT_TEMPLATE.format(
+        filename=file_path.name,
+        directory=file_path.parent.name
+    )
+
     for attempt in range(max_retries):
         try:
             audio_file = client.files.upload(file=file_path)
             response = client.models.generate_content(
                 model="gemini-2.0-flash",
-                contents=[ANALYSIS_PROMPT, audio_file],
+                contents=[prompt, audio_file],
             )
 
             # Parse JSON response
