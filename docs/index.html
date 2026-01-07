@@ -8,6 +8,7 @@
         :root {
             --bg: #1a1a1a;
             --surface: #2d2d2d;
+            --surface-hover: #383838;
             --border: #404040;
             --text: #e0e0e0;
             --text-muted: #888;
@@ -23,20 +24,40 @@
             color: var(--text);
             margin: 0;
             padding: 20px;
+            padding-bottom: 80px;
             line-height: 1.5;
         }
 
         h1 {
-            margin: 0 0 20px;
+            margin: 0 0 8px;
             font-size: 1.8rem;
             color: var(--accent);
         }
 
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .subtitle a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
         .filters {
             display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
         }
 
         input, select {
@@ -58,22 +79,61 @@
             min-width: 200px;
         }
 
+        select {
+            min-width: 120px;
+        }
+
         .stats {
             color: var(--text-muted);
             font-size: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .active-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .active-filter {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .active-filter:hover {
+            background: var(--accent-hover);
+        }
+
+        .active-filter .remove {
+            font-weight: bold;
+        }
+
+        .table-container {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-            table-layout: fixed;
+            font-size: 13px;
+            min-width: 900px;
         }
 
         th {
             text-align: left;
-            padding: 12px 8px;
+            padding: 10px 6px;
             border-bottom: 2px solid var(--border);
             color: var(--text-muted);
             font-weight: 500;
@@ -82,28 +142,19 @@
             background: var(--bg);
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;
         }
 
         th:hover { color: var(--accent); }
         th.sorted { color: var(--accent); }
-        th.sorted::after { content: ' ▼'; }
-        th.sorted.asc::after { content: ' ▲'; }
+        th.sorted::after { content: ' ▼'; font-size: 10px; }
+        th.sorted.asc::after { content: ' ▲'; font-size: 10px; }
 
         td {
-            padding: 10px 8px;
+            padding: 8px 6px;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
-            word-break: break-word;
-            overflow-wrap: break-word;
         }
-
-        /* Column widths */
-        th:nth-child(1), td:nth-child(1) { width: 50px; }
-        th:nth-child(2), td:nth-child(2) { width: 20%; }
-        th:nth-child(3), td:nth-child(3) { width: auto; }
-        th:nth-child(4), td:nth-child(4) { width: 100px; }
-        th:nth-child(5), td:nth-child(5) { width: 80px; }
-        th:nth-child(6), td:nth-child(6) { width: 100px; }
 
         tr:hover { background: var(--surface); }
 
@@ -111,14 +162,15 @@
             background: var(--accent);
             border: none;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .play-btn:hover { background: var(--accent-hover); }
@@ -127,20 +179,28 @@
         .tag {
             display: inline-block;
             background: var(--surface);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin: 2px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin: 1px;
             color: var(--text-muted);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .tag:hover {
+            background: var(--surface-hover);
+            color: var(--text);
         }
 
         .category {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .category-speech { background: #2d4a3e; color: #6bcf8e; }
@@ -154,15 +214,33 @@
         .category-footstep { background: #2d4a4a; color: #6bcfcf; }
         .category-other { background: #3a3a3a; color: #aaa; }
 
-        .duration {
-            color: var(--text-muted);
-            font-variant-numeric: tabular-nums;
+        .mono { font-family: monospace; font-size: 12px; }
+        .num { font-variant-numeric: tabular-nums; text-align: right; }
+        .muted { color: var(--text-muted); }
+        .small { font-size: 11px; }
+
+        .file-info {
+            max-width: 180px;
+        }
+
+        .file-name {
+            font-weight: 500;
+            word-break: break-word;
         }
 
         .file-path {
             font-family: monospace;
-            font-size: 12px;
+            font-size: 10px;
             color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        .description-cell {
+            max-width: 300px;
+        }
+
+        .description-text {
+            margin-bottom: 4px;
         }
 
         .loading {
@@ -177,11 +255,12 @@
             left: 0;
             right: 0;
             background: var(--surface);
-            padding: 12px 20px;
+            padding: 10px 20px;
             display: none;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             border-top: 1px solid var(--border);
+            z-index: 100;
         }
 
         #audio-player.active { display: flex; }
@@ -189,14 +268,16 @@
         #audio-player audio {
             flex: 1;
             height: 32px;
+            max-width: 400px;
         }
 
         #now-playing {
-            font-size: 14px;
+            font-size: 13px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 300px;
+            flex: 1;
+            min-width: 0;
         }
 
         #close-player {
@@ -206,65 +287,122 @@
             cursor: pointer;
             font-size: 20px;
             padding: 4px 8px;
+            flex-shrink: 0;
         }
 
         #close-player:hover { color: var(--text); }
 
-        @media (max-width: 768px) {
-            body { padding: 12px; }
-            .filters { flex-direction: column; }
-            #search { min-width: 100%; }
-            th, td { padding: 8px 4px; font-size: 13px; }
-            .hide-mobile { display: none; }
-            th:nth-child(1), td:nth-child(1) { width: 40px; }
-            th:nth-child(2), td:nth-child(2) { width: 30%; }
-            th:nth-child(4), td:nth-child(4) { width: 70px; }
-            .file-path { display: none; }
-            .tag { padding: 1px 6px; font-size: 11px; }
-            .category { padding: 2px 6px; font-size: 10px; }
+        .format-badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        @media (max-width: 480px) {
-            th:nth-child(2), td:nth-child(2) { width: 25%; }
-            th:nth-child(4), td:nth-child(4) { width: 60px; }
+        .format-wav { background: #3d3d2d; color: #b8b86b; }
+        .format-mp3 { background: #2d3d3d; color: #6bb8b8; }
+
+        .channels-badge {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1200px) {
+            .hide-lg { display: none; }
+        }
+
+        @media (max-width: 900px) {
+            .hide-md { display: none; }
+            table { min-width: 600px; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; padding-bottom: 80px; }
+            .filter-row { flex-direction: column; }
+            select { width: 100%; }
+            #search { min-width: 100%; }
+            .hide-sm { display: none; }
+            table { min-width: 400px; font-size: 12px; }
+            th, td { padding: 6px 4px; }
+            .file-info { max-width: 120px; }
+            .description-cell { max-width: 200px; }
         }
     </style>
 </head>
 <body>
     <h1>Half-Life Sound Catalog</h1>
+    <p class="subtitle">
+        2,555 sounds from Half-Life (1998) ·
+        <a href="https://github.com/elohmeier/hl1" target="_blank">GitHub</a>
+    </p>
 
     <div class="filters">
-        <input type="text" id="search" placeholder="Search sounds...">
-        <select id="category-filter">
-            <option value="">All Categories</option>
-        </select>
-        <select id="directory-filter">
-            <option value="">All Directories</option>
-        </select>
+        <div class="filter-row">
+            <input type="text" id="search" placeholder="Search name, description, tags...">
+            <select id="category-filter">
+                <option value="">All Categories</option>
+            </select>
+            <select id="directory-filter">
+                <option value="">All Directories</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <select id="format-filter">
+                <option value="">All Formats</option>
+                <option value="wav">WAV</option>
+                <option value="mp3">MP3</option>
+            </select>
+            <select id="duration-filter">
+                <option value="">Any Duration</option>
+                <option value="short">Short (&lt; 1s)</option>
+                <option value="medium">Medium (1-5s)</option>
+                <option value="long">Long (5-30s)</option>
+                <option value="verylong">Very Long (&gt; 30s)</option>
+            </select>
+            <select id="channels-filter">
+                <option value="">Any Channels</option>
+                <option value="1">Mono</option>
+                <option value="2">Stereo</option>
+            </select>
+            <select id="samplerate-filter">
+                <option value="">Any Sample Rate</option>
+            </select>
+        </div>
     </div>
 
-    <div class="stats" id="stats">Loading...</div>
+    <div class="stats">
+        <span id="stats">Loading...</span>
+        <div class="active-filters" id="active-filters"></div>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 50px;"></th>
-                <th data-sort="file_name">Name</th>
-                <th data-sort="ai_description">Description</th>
-                <th data-sort="ai_category">Category</th>
-                <th data-sort="duration_seconds" class="hide-mobile">Duration</th>
-                <th data-sort="directory" class="hide-mobile">Directory</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <tr><td colspan="6" class="loading">Loading catalog...</td></tr>
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 36px;"></th>
+                    <th data-sort="file_name">Name</th>
+                    <th data-sort="ai_description">Description</th>
+                    <th data-sort="ai_category">Category</th>
+                    <th data-sort="duration_seconds" class="num">Duration</th>
+                    <th data-sort="directory" class="hide-md">Directory</th>
+                    <th data-sort="format" class="hide-lg">Format</th>
+                    <th data-sort="file_size_bytes" class="num hide-lg">Size</th>
+                    <th data-sort="sample_rate" class="num hide-lg">Sample Rate</th>
+                    <th data-sort="channels" class="hide-lg">Ch</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="10" class="loading">Loading catalog...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <div id="audio-player">
         <span id="now-playing"></span>
         <audio id="audio" controls></audio>
-        <button id="close-player">&times;</button>
+        <button id="close-player">×</button>
     </div>
 
     <script>
@@ -273,6 +411,7 @@
         let sortCol = 'directory';
         let sortAsc = true;
         let currentlyPlaying = null;
+        let activeTagFilter = null;
 
         const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? '..'
@@ -286,6 +425,7 @@
             // Populate filters
             const categories = [...new Set(sounds.map(s => s.ai_category))].sort();
             const directories = [...new Set(sounds.map(s => s.directory))].sort();
+            const sampleRates = [...new Set(sounds.map(s => s.sample_rate))].sort((a, b) => Number(a) - Number(b));
 
             const catSelect = document.getElementById('category-filter');
             categories.forEach(c => {
@@ -301,6 +441,15 @@
                 opt.value = d;
                 opt.textContent = d;
                 dirSelect.appendChild(opt);
+            });
+
+            const srSelect = document.getElementById('samplerate-filter');
+            sampleRates.forEach(sr => {
+                if (!sr) return;
+                const opt = document.createElement('option');
+                opt.value = sr;
+                opt.textContent = `${Number(sr).toLocaleString()} Hz`;
+                srSelect.appendChild(opt);
             });
 
             applyFilters();
@@ -346,19 +495,55 @@
             const search = document.getElementById('search').value.toLowerCase();
             const category = document.getElementById('category-filter').value;
             const directory = document.getElementById('directory-filter').value;
+            const format = document.getElementById('format-filter').value;
+            const duration = document.getElementById('duration-filter').value;
+            const channels = document.getElementById('channels-filter').value;
+            const sampleRate = document.getElementById('samplerate-filter').value;
 
             filteredSounds = sounds.filter(s => {
                 if (category && s.ai_category !== category) return false;
                 if (directory && s.directory !== directory) return false;
+                if (format && s.format !== format) return false;
+                if (channels && s.channels !== channels) return false;
+                if (sampleRate && s.sample_rate !== sampleRate) return false;
+
+                if (duration) {
+                    const dur = parseFloat(s.duration_seconds) || 0;
+                    if (duration === 'short' && dur >= 1) return false;
+                    if (duration === 'medium' && (dur < 1 || dur >= 5)) return false;
+                    if (duration === 'long' && (dur < 5 || dur >= 30)) return false;
+                    if (duration === 'verylong' && dur < 30) return false;
+                }
+
+                if (activeTagFilter) {
+                    const tags = (s.ai_tags || '').toLowerCase().split('|');
+                    if (!tags.includes(activeTagFilter.toLowerCase())) return false;
+                }
+
                 if (search) {
                     const searchable = `${s.file_name} ${s.ai_description} ${s.ai_tags} ${s.directory}`.toLowerCase();
                     if (!searchable.includes(search)) return false;
                 }
+
                 return true;
             });
 
             sortSounds();
             render();
+            updateActiveFilters();
+        }
+
+        function updateActiveFilters() {
+            const container = document.getElementById('active-filters');
+            container.innerHTML = '';
+
+            if (activeTagFilter) {
+                const el = document.createElement('span');
+                el.className = 'active-filter';
+                el.innerHTML = `Tag: ${activeTagFilter} <span class="remove">×</span>`;
+                el.onclick = () => { activeTagFilter = null; applyFilters(); };
+                container.appendChild(el);
+            }
         }
 
         function sortSounds() {
@@ -366,9 +551,12 @@
                 let aVal = a[sortCol];
                 let bVal = b[sortCol];
 
-                if (sortCol === 'duration_seconds') {
+                if (['duration_seconds', 'file_size_bytes', 'sample_rate', 'channels', 'bit_depth'].includes(sortCol)) {
                     aVal = parseFloat(aVal) || 0;
                     bVal = parseFloat(bVal) || 0;
+                } else {
+                    aVal = (aVal || '').toLowerCase();
+                    bVal = (bVal || '').toLowerCase();
                 }
 
                 if (aVal < bVal) return sortAsc ? -1 : 1;
@@ -379,7 +567,7 @@
 
         function render() {
             document.getElementById('stats').textContent =
-                `Showing ${filteredSounds.length} of ${sounds.length} sounds`;
+                `Showing ${filteredSounds.length.toLocaleString()} of ${sounds.length.toLocaleString()} sounds`;
 
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = filteredSounds.map((s, i) => `
@@ -387,21 +575,29 @@
                     <td>
                         <button class="play-btn" data-index="${i}" title="Play">▶</button>
                     </td>
-                    <td>
-                        <div>${escapeHtml(s.file_name)}</div>
+                    <td class="file-info">
+                        <div class="file-name">${escapeHtml(s.file_name)}</div>
                         <div class="file-path">${escapeHtml(s.file_path)}</div>
                     </td>
-                    <td>
-                        <div>${escapeHtml(s.ai_description)}</div>
+                    <td class="description-cell">
+                        <div class="description-text">${escapeHtml(s.ai_description)}</div>
                         <div>${(s.ai_tags || '').split('|').filter(t => t).map(t =>
-                            `<span class="tag">${escapeHtml(t)}</span>`
+                            `<span class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`
                         ).join('')}</div>
                     </td>
                     <td>
                         <span class="category category-${s.ai_category}">${escapeHtml(s.ai_category)}</span>
                     </td>
-                    <td class="duration hide-mobile">${formatDuration(s.duration_seconds)}</td>
-                    <td class="hide-mobile">${escapeHtml(s.directory)}</td>
+                    <td class="num">${formatDuration(s.duration_seconds)}</td>
+                    <td class="hide-md">${escapeHtml(s.directory)}</td>
+                    <td class="hide-lg">
+                        <span class="format-badge format-${s.format}">${s.format}</span>
+                    </td>
+                    <td class="num hide-lg">${formatSize(s.file_size_bytes)}</td>
+                    <td class="num hide-lg">${formatSampleRate(s.sample_rate)}</td>
+                    <td class="hide-lg">
+                        <span class="channels-badge">${s.channels === '1' ? 'M' : s.channels === '2' ? 'S' : s.channels}</span>
+                    </td>
                 </tr>
             `).join('');
 
@@ -422,9 +618,25 @@
 
         function formatDuration(seconds) {
             const s = parseFloat(seconds) || 0;
-            const mins = Math.floor(s / 60);
-            const secs = (s % 60).toFixed(1);
-            return mins > 0 ? `${mins}:${secs.padStart(4, '0')}` : `${secs}s`;
+            if (s >= 60) {
+                const mins = Math.floor(s / 60);
+                const secs = Math.floor(s % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${s.toFixed(1)}s`;
+        }
+
+        function formatSize(bytes) {
+            const b = parseInt(bytes) || 0;
+            if (b >= 1048576) return `${(b / 1048576).toFixed(1)} MB`;
+            if (b >= 1024) return `${(b / 1024).toFixed(0)} KB`;
+            return `${b} B`;
+        }
+
+        function formatSampleRate(rate) {
+            const r = parseInt(rate) || 0;
+            if (r >= 1000) return `${(r / 1000).toFixed(1)}k`;
+            return r.toString();
         }
 
         function playSound(index) {
@@ -433,22 +645,30 @@
             const player = document.getElementById('audio-player');
             const nowPlaying = document.getElementById('now-playing');
 
-            // Update button states
             document.querySelectorAll('.play-btn').forEach(btn => btn.classList.remove('playing'));
             document.querySelector(`.play-btn[data-index="${index}"]`)?.classList.add('playing');
 
             audio.src = `${baseUrl}/${sound.file_path}`;
             audio.play();
 
-            nowPlaying.textContent = `${sound.file_name} - ${sound.ai_description}`;
+            nowPlaying.textContent = `${sound.file_name} — ${sound.ai_description}`;
             player.classList.add('active');
             currentlyPlaying = index;
+        }
+
+        function filterByTag(tag) {
+            activeTagFilter = tag;
+            applyFilters();
         }
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('category-filter').addEventListener('change', applyFilters);
         document.getElementById('directory-filter').addEventListener('change', applyFilters);
+        document.getElementById('format-filter').addEventListener('change', applyFilters);
+        document.getElementById('duration-filter').addEventListener('change', applyFilters);
+        document.getElementById('channels-filter').addEventListener('change', applyFilters);
+        document.getElementById('samplerate-filter').addEventListener('change', applyFilters);
 
         document.querySelector('thead').addEventListener('click', e => {
             const th = e.target.closest('th[data-sort]');
@@ -466,7 +686,16 @@
 
         document.getElementById('table-body').addEventListener('click', e => {
             const btn = e.target.closest('.play-btn');
-            if (btn) playSound(parseInt(btn.dataset.index));
+            if (btn) {
+                playSound(parseInt(btn.dataset.index));
+                return;
+            }
+
+            const tag = e.target.closest('.tag');
+            if (tag) {
+                filterByTag(tag.dataset.tag);
+                return;
+            }
         });
 
         document.getElementById('close-player').addEventListener('click', () => {
@@ -479,7 +708,17 @@
             document.querySelectorAll('.play-btn').forEach(btn => btn.classList.remove('playing'));
         });
 
-        // Load catalog
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === ' ' && currentlyPlaying !== null) {
+                e.preventDefault();
+                const audio = document.getElementById('audio');
+                if (audio.paused) audio.play();
+                else audio.pause();
+            }
+        });
+
         loadCatalog();
     </script>
 </body>
